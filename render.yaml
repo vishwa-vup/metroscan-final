@@ -1,0 +1,43 @@
+# MetroScan — Render Blueprint (deploys from GitHub: vishwa-vup/metroscan-final, branch main)
+# Dashboard flow: Render -> New -> Blueprint -> select this repo -> Apply.
+# Fill DATABASE_URL when prompted (Supabase Session Pooler URL). Never commit secrets.
+services:
+  # ---------- Backend API (FastAPI via Docker) ----------
+  - type: web
+    name: metroscan-api
+    runtime: docker
+    dockerContext: .
+    dockerfilePath: backend/Dockerfile
+    # torch + EasyOCR image is large: free tier may run out of build memory.
+    # If the Docker build fails, switch this service to plan: starter.
+    plan: free
+    healthCheckPath: /healthz
+    envVars:
+      - key: ENVIRONMENT
+        value: production
+      - key: DATABASE_URL
+        sync: false # paste Supabase pooler URL in dashboard (see metroscan-render.env)
+      - key: JWT_SECRET
+        generateValue: true # Render auto-generates a strong secret
+      - key: CORS_ORIGINS
+        value: https://metroscan-web.onrender.com # edit if your frontend URL differs
+      # Ephemeral filesystem without a disk: uploads vanish on restart.
+      # Attach a persistent disk first, then uncomment:
+      # - key: STORAGE_DIR
+      #   value: /data/scans
+
+  # ---------- Frontend (React SPA, static) ----------
+  - type: web
+    name: metroscan-web
+    runtime: static
+    rootDir: frontend
+    buildCommand: npm install && npm run build
+    staticPublishPath: ./dist
+    # SPA fallback so React Router paths (/login, /scans, ...) load directly.
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    envVars:
+      - key: VITE_API_BASE_URL
+        value: https://metroscan-api.onrender.com # must match the backend public URL

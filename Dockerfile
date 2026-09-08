@@ -42,6 +42,9 @@ USER appuser
 RUN python -c "import easyocr; easyocr.Reader(['en'], gpu=False)"
 
 EXPOSE 8000
+# Default serve port. Render injects its own $PORT at runtime (overrides this);
+# HuggingFace Spaces routes to 7860, so 7860 is the default for HF builds.
+ENV PORT=7860
 HEALTHCHECK --interval=30s --timeout=5s --start-period=90s --retries=3 \
   CMD python -c "import os,urllib.request; p=os.environ.get('PORT','8000'); urllib.request.urlopen(f'http://localhost:{p}/healthz')"
 # Platform PORT at runtime ($PORT set by Render); 8000 local default.

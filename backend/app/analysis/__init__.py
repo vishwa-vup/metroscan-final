@@ -1,0 +1,1 @@
+"""MetroScan analysis subpackage (Phase 0 placeholder; placement/readability land in Phase 6)."""

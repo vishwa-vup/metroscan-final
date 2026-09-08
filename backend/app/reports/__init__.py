@@ -1,0 +1,1 @@
+"""MetroScan reports subpackage (Phase 0 placeholder; ReportLab/python-docx land in Phase 5)."""

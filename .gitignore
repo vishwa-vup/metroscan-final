@@ -1,0 +1,38 @@
+# secrets — never commit real values
+.env
+*.env
+!.env.example
+!**/.env.example
+
+# python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+
+# node
+node_modules/
+dist/
+dist-ssr/
+*.local
+
+# uploads / derived evidence (originals immutable, stored per Phase 5+)
+backend/var/
+backend/uploads/
+backend/tmp/
+var/
+*.log
+
+# DB / local PG data
+pgdata/
+
+# OS / editors
+.DS_Store
+Thumbs.db
+.vscode/*
+!.vscode/launch.json
+!.vscode/tasks.json
+.idea/

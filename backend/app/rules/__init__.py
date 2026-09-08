@@ -1,0 +1,1 @@
+"""MetroScan rules subpackage (Phase 0 placeholder; JSON engine lands in Phase 3)."""

@@ -1,0 +1,1 @@
+"""MetroScan ocr subpackage (Phase 0 placeholder; EasyOCR wrapper lands in Phase 1)."""

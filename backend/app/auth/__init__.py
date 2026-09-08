@@ -1,0 +1,1 @@
+"""MetroScan auth subpackage (Phase 0 placeholder; JWT+RBAC land in Phase 7)."""

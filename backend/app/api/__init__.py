@@ -1,0 +1,1 @@
+"""MetroScan api subpackage (Phase 0 placeholder; versioned routers land per-phase)."""

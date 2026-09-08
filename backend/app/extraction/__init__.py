@@ -1,0 +1,1 @@
+"""MetroScan extraction subpackage (Phase 0 placeholder; regex+proximity lands in Phase 2)."""

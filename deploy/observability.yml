@@ -1,0 +1,23 @@
+events:
+  - auth.login
+  - auth.login_failed
+  - scan.receive
+  - scan.reject
+  - scan.complete
+  - review.created
+  - review.submitted
+  - report.generated
+secrets:
+  - password
+  - token
+  - authorization
+  - cookie
+scrub_patterns:
+  - 'Bearer\s+\S+'
+  - 'password[=:]\S*'
+  - 'token[=:]\S*'
+
+observability:
+  level: INFO
+  scrub_secrets: true
+  request_id_header: X-Request-ID

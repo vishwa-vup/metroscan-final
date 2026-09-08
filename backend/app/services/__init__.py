@@ -1,0 +1,1 @@
+"""MetroScan services subpackage (Phase 0 placeholder; scan pipeline lands in Phase 1)."""

@@ -1,0 +1,1 @@
+"""MetroScan db subpackage (Phase 0 placeholder; PostgreSQL models land in Phase 5)."""

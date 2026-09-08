@@ -1,0 +1,1 @@
+"""MetroScan preprocessing subpackage (Phase 0 placeholder; OpenCV steps land in Phase 1/6)."""

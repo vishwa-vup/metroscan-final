@@ -1,0 +1,94 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "backend: install",
+      "type": "shell",
+      "command": "pip install -r requirements.txt",
+      "options": { "cwd": "${workspaceFolder}/backend" },
+      "problemMatcher": []
+    },
+    {
+      "label": "backend: test",
+      "type": "shell",
+      "command": "python -m pytest tests -q",
+      "options": { "cwd": "${workspaceFolder}/backend" },
+      "group": "test",
+      "problemMatcher": []
+    },
+    {
+      "label": "backend: migrate",
+      "type": "shell",
+      "command": "python -m alembic upgrade head",
+      "options": { "cwd": "${workspaceFolder}/backend", "env": { "PYTHONPATH": "${workspaceFolder}/backend" } },
+      "problemMatcher": []
+    },
+    {
+      "label": "backend: seed admin",
+      "type": "shell",
+      "command": "python deploy/init_db.py",
+      "options": { "cwd": "${workspaceFolder}/backend", "env": { "PYTHONPATH": "${workspaceFolder}/backend" } },
+      "problemMatcher": []
+    },
+    {
+      "label": "backend: run (dev)",
+      "type": "shell",
+      "command": "python -m uvicorn app.main:app --host 127.0.0.1 --port 8000",
+      "options": { "cwd": "${workspaceFolder}/backend", "env": { "PYTHONPATH": "${workspaceFolder}/backend" } },
+      "isBackground": true,
+      "problemMatcher": {
+        "pattern": { "regexp": "." },
+        "background": { "activeOnStart": true, "beginsPattern": ".", "endsPattern": "Application startup complete" }
+      }
+    },
+    {
+      "label": "backend: run (cloud-sim)",
+      "type": "shell",
+      "command": "python -m uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8001}",
+      "options": { "cwd": "${workspaceFolder}/backend", "env": { "PYTHONPATH": "${workspaceFolder}/backend" } },
+      "isBackground": true,
+      "problemMatcher": {
+        "pattern": { "regexp": "." },
+        "background": { "activeOnStart": true, "beginsPattern": ".", "endsPattern": "Application startup complete" }
+      }
+    },
+    {
+      "label": "frontend: install",
+      "type": "shell",
+      "command": "npm install",
+      "options": { "cwd": "${workspaceFolder}/frontend" },
+      "problemMatcher": []
+    },
+    {
+      "label": "frontend: test",
+      "type": "shell",
+      "command": "npm test",
+      "options": { "cwd": "${workspaceFolder}/frontend" },
+      "group": "test",
+      "problemMatcher": []
+    },
+    {
+      "label": "frontend: dev",
+      "type": "shell",
+      "command": "npm run dev",
+      "options": { "cwd": "${workspaceFolder}/frontend" },
+      "isBackground": true,
+      "problemMatcher": []
+    },
+    {
+      "label": "frontend: build",
+      "type": "shell",
+      "command": "npm run build",
+      "options": { "cwd": "${workspaceFolder}/frontend" },
+      "group": "build",
+      "problemMatcher": []
+    },
+    {
+      "label": "deploy: verify stack",
+      "type": "shell",
+      "command": "python deploy/verify_stack.py",
+      "options": { "cwd": "${workspaceFolder}/backend", "env": { "PYTHONPATH": "${workspaceFolder}/backend" } },
+      "problemMatcher": []
+    }
+  ]
+}

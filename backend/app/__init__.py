@@ -1,0 +1,1 @@
+"""MetroScan backend application package."""

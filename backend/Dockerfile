@@ -22,6 +22,12 @@ RUN mkdir -p /data/scans backend/var/scans \
  && chown -R appuser:appuser /app /data/scans
 USER appuser
 
+# Bake EasyOCR detection + English recognition models into the image (as the
+# runtime user, so its ~/.EasyOCR cache is used). Without this, the FIRST scan
+# request downloads ~100MB+ at runtime — cloud request timeouts kill it (502)
+# and ephemeral disks repeat the download after every restart.
+RUN python -c "import easyocr; easyocr.Reader(['en'], gpu=False)"
+
 EXPOSE 8000
 HEALTHCHECK --interval=30s --timeout=5s --start-period=60s --retries=3 \
   CMD python -c "import os,urllib.request; p=os.environ.get('PORT','8000'); urllib.request.urlopen(f'http://localhost:{p}/healthz')"

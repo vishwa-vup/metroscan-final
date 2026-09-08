@@ -40,4 +40,4 @@ services:
         destination: /index.html
     envVars:
       - key: VITE_API_BASE_URL
-        value: https://metroscan-api.onrender.com # must match the backend public URL
+        value: https://metroscan-api-19u5.onrender.com # real backend URL (Render suffixed it)

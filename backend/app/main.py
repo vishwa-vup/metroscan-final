@@ -102,3 +102,33 @@ def api_version() -> dict:
         "ruleset_version": "not-loaded-yet (Phase 3)",
         "disclaimer": "decision support only; potential non-compliance pending inspector review",
     }
+
+
+# ---- All-in-one web serving (Render single service) ----
+# When a built frontend exists at FRONTEND_DIST (Docker image copies
+# frontend/dist there), serve it at "/" with SPA fallback to index.html.
+# Skipped entirely in local dev without a build — API behavior unchanged.
+def _mount_frontend() -> None:
+    import os
+
+    dist = os.environ.get("FRONTEND_DIST", os.path.join(os.path.dirname(__file__), "..", "frontend_dist"))
+    index = os.path.join(dist, "index.html")
+    if not os.path.isfile(index):
+        return
+
+    from fastapi.staticfiles import StaticFiles
+    from starlette.exceptions import HTTPException as StarletteHTTPException
+
+    class SPAStaticFiles(StaticFiles):
+        async def get_response(self, path, scope):  # noqa: ANN001, ANN202
+            try:
+                return await super().get_response(path, scope)
+            except StarletteHTTPException as exc:
+                if exc.status_code == 404:
+                    return await super().get_response("index.html", scope)
+                raise
+
+    app.mount("/", SPAStaticFiles(directory=dist, html=True), name="web")
+
+
+_mount_frontend()

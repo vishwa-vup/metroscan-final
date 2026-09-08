@@ -2,30 +2,71 @@
 @tailwind components;
 @tailwind utilities;
 
-/* MetroScan design base: system type, visible keyboard focus (§28 rule 10),
-   tabular numerals for metrics, calm slate canvas. */
+/* MetroScan design system v1.0 (frontend-only).
+   Tokens: navy chrome, indigo primary, cool-gray canvas.
+   System type preserved; focus + reduced-motion + skeleton included. */
+
+:root {
+  --ms-navy: #081224;
+  --ms-primary: #5b5ceb;
+  --ms-highlight: #7c6fff;
+  --ms-canvas: #f5f7fb;
+  --ms-ink: #111827;
+  --ms-muted: #64748b;
+  --ms-ok: #20c997;
+  --ms-warn: #f5b942;
+  --ms-bad: #ef5b6b;
+  --ms-radius: 12px;
+}
 
 @layer base {
   html {
     -webkit-text-size-adjust: 100%;
   }
   body {
-    @apply bg-slate-100 text-slate-900 antialiased;
+    @apply bg-canvas text-ink antialiased;
     font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
       "Helvetica Neue", Arial, sans-serif;
+    line-height: 1.5;
   }
   :focus-visible {
-    outline: 2px solid #4f46e5;
+    outline: 2px solid var(--ms-primary);
     outline-offset: 2px;
     border-radius: 4px;
   }
   ::selection {
     background: #c7d2fe;
   }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
 }
 
 @layer utilities {
   .tnum {
     font-variant-numeric: tabular-nums;
+  }
+  /* Restrained skeleton shimmer for async loading states */
+  .ms-skeleton {
+    position: relative;
+    overflow: hidden;
+    background: #e8edf5;
+  }
+  .ms-skeleton::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,.7), transparent);
+    animation: ms-shimmer 1.4s infinite;
+  }
+  @keyframes ms-shimmer {
+    from { transform: translateX(-100%); }
+    to { transform: translateX(100%); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .ms-skeleton::after { animation: none; }
   }
 }

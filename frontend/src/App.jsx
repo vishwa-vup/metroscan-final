@@ -1,8 +1,8 @@
-import { useState } from "react";
-import { Link, Route, Routes } from "react-router-dom";
+import { Route, Routes } from "react-router-dom";
 import AppShell from "./components/AppShell.jsx";
 import { AuthGuard, RoleGuard } from "./components/AuthGuard.jsx";
-import { Card } from "./components/ui.jsx";
+import { Icon } from "./components/icons.jsx";
+import { Card, PrimaryLink, SecondaryLink } from "./components/ui.jsx";
 import Capture from "./pages/Capture.jsx";
 import Dashboard from "./pages/Dashboard.jsx";
 import Login from "./pages/Login.jsx";
@@ -33,16 +33,17 @@ export default function App() {
           path="/"
           element={
             <Card className="overflow-hidden p-0">
-              <div className="bg-slate-900 px-6 py-8 text-white sm:px-10">
-                <h1 className="text-3xl font-bold tracking-tight">MetroScan</h1>
-                <p className="mt-2 max-w-xl text-slate-300">
-                  AI-assisted Legal Metrology compliance scanner — decision support only.
+              <div className="bg-brand-navy px-6 py-10 text-white sm:px-10">
+                <p className="text-xs font-semibold uppercase tracking-widest text-brand-highlight">SIH26034 · Decision support only</p>
+                <h1 className="mt-1 text-3xl font-bold tracking-tight sm:text-4xl">MetroScan</h1>
+                <p className="mt-2 max-w-xl text-sm leading-relaxed text-slate-300">
+                  AI-assisted Legal Metrology compliance scanner.
                   Potential non-compliance, pending inspector review. Never an autonomous legal verdict.
                 </p>
                 <div className="mt-5 flex flex-wrap gap-2">
-                  <Link to="/capture" className="inline-flex items-center rounded-lg bg-indigo-500 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-400">📷 Capture a label</Link>
-                  <Link to="/upload" className="inline-flex items-center rounded-lg border border-white/25 px-4 py-2 text-sm font-medium text-white hover:bg-white/10">Upload an image</Link>
-                  <Link to="/dashboard" className="inline-flex items-center rounded-lg border border-white/25 px-4 py-2 text-sm font-medium text-white hover:bg-white/10">Open dashboard</Link>
+                  <PrimaryLink to="/capture"><Icon name="capture" /> Capture a label</PrimaryLink>
+                  <SecondaryLink to="/upload" className="border-white/25 bg-transparent text-white hover:bg-white/10"><Icon name="upload" /> Upload an image</SecondaryLink>
+                  <SecondaryLink to="/dashboard" className="border-white/25 bg-transparent text-white hover:bg-white/10"><Icon name="dashboard" /> Open dashboard</SecondaryLink>
                 </div>
               </div>
               <div className="grid gap-3 p-6 sm:grid-cols-3">
@@ -51,9 +52,9 @@ export default function App() {
                   ["2 · Verify", "OCR + rules with confidence, clauses and evidence beside the photo."],
                   ["3 · Decide", "Inspectors confirm or clear; reports export to PDF and DOCX."],
                 ].map(([t, d]) => (
-                  <div key={t} className="rounded-lg bg-slate-50 p-3">
-                    <p className="text-sm font-semibold text-slate-900">{t}</p>
-                    <p className="mt-0.5 text-sm text-slate-600">{d}</p>
+                  <div key={t} className="rounded-card border border-slate-200 bg-slate-50 p-4">
+                    <p className="text-sm font-semibold text-ink">{t}</p>
+                    <p className="mt-1 text-sm leading-relaxed text-muted">{d}</p>
                   </div>
                 ))}
               </div>

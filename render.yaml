@@ -1,21 +1,26 @@
-# MetroScan — Render Blueprint, step A (deploys from GitHub: vishwa-vup/metroscan-final, branch main)
-# Transitional state: API only. The old static metroscan-web is removed here so
-# step B can recreate the name as the all-in-one Docker service (Render forbids
-# changing a service's type in place). Never commit secrets.
+# MetroScan — Render deploy (deploys from GitHub: vishwa-vup/metroscan-final, branch main)
+# All-in-one Docker service: builds the React frontend and serves it from
+# FastAPI on one URL (same-origin, no CORS setup). Currently deployed MANUALLY
+# (dashboard -> New Web Service); this file documents the setup. Never commit secrets.
 services:
   - type: web
-    name: metroscan-api
+    name: metroscan-web
     runtime: docker
     dockerContext: .
-    dockerfilePath: backend/Dockerfile
+    dockerfilePath: ./Dockerfile
+    # torch + EasyOCR image is large: free tier may run out of build memory.
+    # If the Docker build fails, switch this service to plan: starter.
     plan: free
     healthCheckPath: /healthz
     envVars:
       - key: ENVIRONMENT
         value: production
       - key: DATABASE_URL
-        sync: false # Supabase pooler URL already set in dashboard; kept, not recreated
+        sync: false # Supabase pooler URL, set in dashboard
       - key: JWT_SECRET
-        sync: false # keep existing generated secret; do not regenerate
-      - key: CORS_ORIGINS
-        value: https://metroscan-web.onrender.com
+        sync: false # existing secret preserved from previous service; do not regenerate
+      # Same-origin app: frontend calls relative /api/..., so no CORS_ORIGINS needed.
+      # Ephemeral filesystem without a disk: uploads vanish on restart.
+      # Attach a persistent disk first, then uncomment:
+      # - key: STORAGE_DIR
+      #   value: /data/scans

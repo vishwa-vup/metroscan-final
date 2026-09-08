@@ -78,12 +78,16 @@ def save_scan(rec) -> bool:
             for model in (OcrToken, ExtractedField, RuleEvaluation, InspectorReview):
                 s.query(model).filter_by(scan_id=rec.scan_id).delete()
             s.delete(old)
+        # Flush the parent row BEFORE adding children: a single end-of-transaction
+        # flush has been observed emitting child INSERTs first (FK violation on
+        # PostgreSQL/Supabase), leaving scans without any persisted output.
         s.add(Scan(id=rec.scan_id, filename=rec.filename, width=rec.width,
                    height=rec.height, processing_state=rec.processing_state,
                    rule_set_version=rec.rule_set_version,
                    pipeline_version=rec.pipeline_version, asset_name=rec.asset_name,
                    business_id=getattr(rec, "business_id", None),
                    created_by=getattr(rec, "created_by", "") or ""))
+        s.flush()
         for t in (rec.ocr.tokens if rec.ocr else []):
             s.add(OcrToken(scan_id=rec.scan_id, idx=t.index, text=t.text,
                            confidence=t.confidence, x1=t.box[0], y1=t.box[1],

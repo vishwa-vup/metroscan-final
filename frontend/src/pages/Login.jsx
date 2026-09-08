@@ -12,16 +12,21 @@ export default function Login() {
   const nav = useNavigate();
   const loc = useLocation();
 
+  // 75s timeout: free-tier API cold-starts can take ~50s+ on mobile networks.
+  // Without this the button spins forever and the page looks "stuck".
   async function submit(e) {
     e.preventDefault();
     if (busy) return;
     setError("");
     setBusy(true);
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), 75000);
     try {
       const r = await fetch(`${API_BASE}/api/v1/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
+        signal: ctrl.signal,
       });
       if (!r.ok) {
         const detail = await r.json().catch(() => ({}));
@@ -31,8 +36,15 @@ export default function Login() {
       setAuth({ access_token: body.access_token, role: body.role, email: body.email });
       nav(loc.state?.from || "/dashboard", { replace: true });
     } catch (err) {
-      setError(err.message);
+      setError(
+        err?.name === "AbortError"
+          ? "Server is taking too long — on the free tier it sleeps when idle and needs ~1 minute to wake. Tap Log in to retry."
+          : err.message === "Failed to fetch"
+            ? "Couldn't reach the server — check your connection (use the public site URL, not localhost, on your phone) and tap Log in to retry."
+            : err.message,
+      );
     } finally {
+      clearTimeout(timer);
       setBusy(false);
     }
   }
@@ -49,7 +61,7 @@ export default function Login() {
       <Card>
         <form className="space-y-3" onSubmit={submit}>
           <Field label="Email">
-            <TextInput placeholder="inspector@example.com" autoComplete="username" value={email} onChange={(e) => setEmail(e.target.value)} required />
+            <TextInput placeholder="inspector@example.com" autoComplete="username" inputMode="email" autoCapitalize="none" autoCorrect="off" value={email} onChange={(e) => setEmail(e.target.value)} required />
           </Field>
           <Field label="Password">
             <TextInput placeholder="••••••••" type="password" autoComplete="current-password" value={password} onChange={(e) => setPassword(e.target.value)} required />

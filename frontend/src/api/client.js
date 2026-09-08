@@ -26,10 +26,25 @@ export function authHeaders() {
 }
 
 export async function api(path, opts = {}) {
-  const r = await fetch(`${API_BASE}${path}`, {
-    ...opts,
-    headers: { ...(opts.body instanceof FormData ? {} : { "Content-Type": "application/json" }), ...authHeaders(), ...(opts.headers || {}) },
-  });
+  // 75s timeout so mobile/flaky networks (and free-tier cold starts) fail
+  // with a retryable error instead of hanging forever.
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), opts.timeout || 75000);
+  let r;
+  try {
+    r = await fetch(`${API_BASE}${path}`, {
+      ...opts,
+      signal: opts.signal || ctrl.signal,
+      headers: { ...(opts.body instanceof FormData ? {} : { "Content-Type": "application/json" }), ...authHeaders(), ...(opts.headers || {}) },
+    });
+  } catch (err) {
+    if (err?.name === "AbortError") {
+      throw new Error("server is waking up (free tier sleeps when idle) — please retry in a minute");
+    }
+    throw new Error("couldn't reach the server — check your connection and retry");
+  } finally {
+    clearTimeout(timer);
+  }
   if (r.status === 401) {
     clearAuth();
     if (!location.pathname.startsWith("/login")) location.href = "/login";

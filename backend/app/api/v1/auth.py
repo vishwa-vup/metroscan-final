@@ -62,6 +62,58 @@ def me(user: dict = Depends(get_current_user)):
     return {"email": user["email"], "role": user["role"], "business_id": user["business_id"]}
 
 
+class GoogleBody(BaseModel):
+    credential: str
+
+
+@auth_router.post("/google")
+def google_login(body: GoogleBody):
+    """User-portal Google sign-in. Verifies the GIS ID token server-side, maps
+    the Google subject to a USER (business-role) account, and issues the normal
+    app JWT. Never creates or elevates inspector/admin accounts."""
+    from app.auth.google_auth import GoogleAuthError, GoogleNotConfigured
+    from app.auth.google_auth import verify_google_credential
+    from app.observability import log_event
+
+    try:
+        identity = verify_google_credential(body.credential)
+    except GoogleNotConfigured as exc:
+        raise HTTPException(status_code=503, detail=str(exc))
+    except GoogleAuthError:
+        log_event("auth.google_failed", reason="invalid-credential")
+        raise HTTPException(status_code=401, detail="invalid google credential")
+    if not repo.db_available():
+        raise HTTPException(status_code=503, detail="database temporarily unreachable, retry shortly")
+    s = dbs.session_factory()()
+    try:
+        user = s.query(User).filter_by(google_sub=identity["sub"]).first()
+        if user is None:
+            existing = s.query(User).filter_by(email=identity["email"]).first()
+            if existing is not None:
+                # Password accounts are never overwritten or linked silently.
+                log_event("auth.google_failed", actor=identity["email"],
+                          reason="email-exists")
+                raise HTTPException(
+                    status_code=409,
+                    detail="an account with this email already exists — log in with your password")
+            biz = Business(name=f"user-{identity['email']}")
+            s.add(biz)
+            s.flush()
+            # Self-service role only: Google can never mint inspector/admin.
+            user = User(email=identity["email"], password_hash="",
+                        role="business", business_id=biz.id,
+                        google_sub=identity["sub"])
+            s.add(user)
+            s.commit()
+            log_event("auth.google_signup", actor=user.email)
+        token = create_token(user.email, user.role, user.business_id)
+        log_event("auth.login", actor=user.email, role=user.role, via="google")
+        return {"access_token": token, "token_type": "bearer",
+                "role": user.role, "email": user.email}
+    finally:
+        s.close()
+
+
 @admin_router.get("/users")
 def list_users(user: dict = Depends(require_admin)):
     s = dbs.session_factory()()

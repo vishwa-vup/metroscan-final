@@ -22,6 +22,10 @@ class User(Base):
     password_hash: Mapped[str] = mapped_column(String(255), default="")
     role: Mapped[str] = mapped_column(String(32), default="inspector", index=True)
     business_id: Mapped[int | None] = mapped_column(ForeignKey("businesses.id"), nullable=True)
+    # Stable Google identity key (sub claim). NULL until the user links Google;
+    # never used as an authorization source — the DB role always wins.
+    google_sub: Mapped[str | None] = mapped_column(String(255), unique=True,
+                                                  nullable=True, index=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
 
 

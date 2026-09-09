@@ -1,13 +1,23 @@
 import { useState } from "react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
-import { clearAuth, getAuth } from "../api/client.js";
+import { isStaffRole, useAuth } from "./AuthContext.jsx";
 import { Icon } from "./icons.jsx";
+import { ToastHost, toast } from "./Toast.jsx";
 
-const NAV = [
+const STAFF_NAV = [
   ["/dashboard", "Dashboard", "dashboard"],
-  ["/scans", "Scans", "scans"],
+  ["/scans", "Inspection Queue", "scans"],
   ["/capture", "Capture", "capture"],
   ["/upload", "Upload", "upload"],
+];
+
+// User portal: only self-service destinations (backend scopes business users
+// to their own scans; review/admin routes stay staff-only).
+const USER_NAV = [
+  ["/user/dashboard", "Dashboard", "dashboard"],
+  ["/user/scan", "Scan Product", "capture"],
+  ["/user/upload", "Upload Image", "upload"],
+  ["/user/scans", "My Scans", "scans"],
 ];
 
 function sideCls({ isActive }) {
@@ -18,13 +28,20 @@ function sideCls({ isActive }) {
   }`;
 }
 
-// AppShell v1.0 (frontend-only): navy sidebar + quiet topbar + mobile nav.
-// Same routes, same auth behavior, same logout. Backend untouched.
+// AppShell v1.1: navy sidebar + quiet topbar + mobile nav, role-aware links.
+// Same auth behavior via central context; logout toast; backend untouched.
 export default function AppShell({ children }) {
-  const auth = getAuth();
+  const { auth, logout } = useAuth();
   const nav = useNavigate();
   const [open, setOpen] = useState(false);
   const initial = (auth?.email || "?").slice(0, 1).toUpperCase();
+  const NAV = isStaffRole(auth?.role) || !auth ? STAFF_NAV : USER_NAV;
+
+  function doLogout() {
+    logout();
+    toast("Logged out.");
+    nav("/login");
+  }
 
   return (
     <div className="flex min-h-screen bg-canvas text-ink">
@@ -66,7 +83,7 @@ export default function AppShell({ children }) {
                 aria-label="Log out"
                 title="Log out"
                 className="rounded-lg p-2 text-slate-300 hover:bg-white/10 hover:text-white"
-                onClick={() => { clearAuth(); nav("/login"); }}
+                onClick={() => { doLogout(); }}
               >
                 <Icon name="logout" />
               </button>
@@ -106,7 +123,7 @@ export default function AppShell({ children }) {
                 </span>
                 <button
                   className="rounded-lg border border-slate-300 px-3 py-1.5 text-[13px] font-semibold text-slate-700 hover:bg-slate-50 md:hidden"
-                  onClick={() => { clearAuth(); nav("/login"); }}
+                  onClick={() => { doLogout(); }}
                 >
                   Logout
                 </button>
@@ -129,6 +146,7 @@ export default function AppShell({ children }) {
         </header>
 
         <main className="mx-auto w-full max-w-shell flex-1 space-y-4 px-4 py-6">{children}</main>
+        <ToastHost />
         <footer className="border-t border-slate-200 bg-white">
           <p className="mx-auto max-w-shell px-4 py-3 text-xs leading-relaxed text-muted">
             MetroScan is decision support only — potential non-compliance, pending inspector review. Never an autonomous legal verdict.

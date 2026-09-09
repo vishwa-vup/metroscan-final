@@ -1,12 +1,14 @@
-import { Route, Routes } from "react-router-dom";
+import { Link, Route, Routes } from "react-router-dom";
 import AppShell from "./components/AppShell.jsx";
+import { AuthProvider, RequireAuth, RequireRole, Unauthorized } from "./components/AuthContext.jsx";
 import { AuthGuard, RoleGuard } from "./components/AuthGuard.jsx";
 import { Icon } from "./components/icons.jsx";
 import { Card, PrimaryLink, SecondaryLink } from "./components/ui.jsx";
 import Capture from "./pages/Capture.jsx";
 import Dashboard from "./pages/Dashboard.jsx";
-import Login from "./pages/Login.jsx";
+import { InspectorLogin, UserLogin } from "./pages/Logins.jsx";
 import Placeholder from "./pages/Placeholder.jsx";
+import PortalSelect from "./pages/PortalSelect.jsx";
 import ReportPage from "./pages/ReportPage.jsx";
 import Review from "./pages/Review.jsx";
 import ScanDetail from "./pages/ScanDetail.jsx";
@@ -14,21 +16,43 @@ import Scans from "./pages/Scans.jsx";
 import Upload from "./pages/Upload.jsx";
 import AdminUsers from "./pages/AdminUsers.jsx";
 
-// Routes §28 (Phase 7: all routes live; guards are usability, backend enforces).
+function NotFound() {
+  return (
+    <div className="mx-auto max-w-md rounded-card border border-slate-200 bg-white p-6 text-center shadow-card">
+      <p className="text-base font-semibold text-ink">Page not found</p>
+      <p className="mt-1 text-sm text-muted">The link may be wrong. Continue from your portal instead.</p>
+      <p className="mt-3"><Link to="/login" className="font-semibold text-brand-primary hover:underline">Go to portal selection</Link></p>
+    </div>
+  );
+}
+
+// Routes: portal selection + role portals. User routes reuse the same pages
+// (backend already scopes business users to their own scans); inspector-only
+// review/admin routes are staff-guarded. Backend authorization stays authoritative.
 export default function App() {
   return (
-    <AppShell>
-      <Routes>
-        <Route path="/login" element={<Login />} />
-        <Route path="/capture" element={<AuthGuard><Capture /></AuthGuard>} />
-        <Route path="/upload" element={<AuthGuard><Upload /></AuthGuard>} />
-        <Route path="/scan/:id" element={<AuthGuard><ScanDetail /></AuthGuard>} />
-        <Route path="/review/:id" element={<AuthGuard><Review /></AuthGuard>} />
-        <Route path="/scans" element={<AuthGuard><Scans /></AuthGuard>} />
-        <Route path="/dashboard" element={<AuthGuard><Dashboard /></AuthGuard>} />
-        <Route path="/reports/:id" element={<AuthGuard><ReportPage /></AuthGuard>} />
-        <Route path="/admin/users" element={<AuthGuard><RoleGuard roles={["admin"]}><AdminUsers /></RoleGuard></AuthGuard>} />
-        <Route path="/admin/rules" element={<AuthGuard><RoleGuard roles={["admin"]}><Placeholder title="Admin rules" hint="Rule listing is live at /api/v1/rules; version switching is an ops action." /></RoleGuard></AuthGuard>} />
+    <AuthProvider>
+      <AppShell>
+        <Routes>
+          <Route path="/login" element={<PortalSelect />} />
+          <Route path="/user/login" element={<UserLogin />} />
+          <Route path="/inspector/login" element={<InspectorLogin />} />
+          <Route path="/user/dashboard" element={<RequireAuth><Dashboard /></RequireAuth>} />
+          <Route path="/user/scan" element={<RequireAuth><Capture /></RequireAuth>} />
+          <Route path="/user/upload" element={<RequireAuth><Upload /></RequireAuth>} />
+          <Route path="/user/scans" element={<RequireAuth><Scans /></RequireAuth>} />
+          <Route path="/user/scan/:id" element={<RequireAuth><ScanDetail /></RequireAuth>} />
+          <Route path="/user/reports/:id" element={<RequireAuth><ReportPage /></RequireAuth>} />
+          <Route path="/capture" element={<AuthGuard><Capture /></AuthGuard>} />
+          <Route path="/upload" element={<AuthGuard><Upload /></AuthGuard>} />
+          <Route path="/scan/:id" element={<AuthGuard><ScanDetail /></AuthGuard>} />
+          <Route path="/review/:id" element={<RequireRole roles={["inspector", "admin"]}><Review /></RequireRole>} />
+          <Route path="/scans" element={<AuthGuard><Scans /></AuthGuard>} />
+          <Route path="/dashboard" element={<AuthGuard><Dashboard /></AuthGuard>} />
+          <Route path="/reports/:id" element={<AuthGuard><ReportPage /></AuthGuard>} />
+          <Route path="/unauthorized" element={<Unauthorized />} />
+          <Route path="/admin/users" element={<AuthGuard><RoleGuard roles={["admin"]}><AdminUsers /></RoleGuard></AuthGuard>} />
+          <Route path="/admin/rules" element={<AuthGuard><RoleGuard roles={["admin"]}><Placeholder title="Admin rules" hint="Rule listing is live at /api/v1/rules; version switching is an ops action." /></RoleGuard></AuthGuard>} />
         <Route
           path="/"
           element={
@@ -41,9 +65,9 @@ export default function App() {
                   Potential non-compliance, pending inspector review. Never an autonomous legal verdict.
                 </p>
                 <div className="mt-5 flex flex-wrap gap-2">
-                  <PrimaryLink to="/capture"><Icon name="capture" /> Capture a label</PrimaryLink>
-                  <SecondaryLink to="/upload" className="border-white/25 bg-transparent text-white hover:bg-white/10"><Icon name="upload" /> Upload an image</SecondaryLink>
-                  <SecondaryLink to="/dashboard" className="border-white/25 bg-transparent text-white hover:bg-white/10"><Icon name="dashboard" /> Open dashboard</SecondaryLink>
+                  <PrimaryLink to="/login"><Icon name="capture" /> Scan Product</PrimaryLink>
+                  <SecondaryLink to="/user/upload" className="border-white/25 bg-transparent text-white hover:bg-white/10"><Icon name="upload" /> Upload Image</SecondaryLink>
+                  <SecondaryLink to="/login" className="border-white/25 bg-transparent text-white hover:bg-white/10"><Icon name="dashboard" /> Choose Portal</SecondaryLink>
                 </div>
               </div>
               <div className="grid gap-3 p-6 sm:grid-cols-3">
@@ -61,8 +85,10 @@ export default function App() {
             </Card>
           }
         />
-      </Routes>
-    </AppShell>
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </AppShell>
+    </AuthProvider>
   );
 }
 

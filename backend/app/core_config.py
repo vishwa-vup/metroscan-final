@@ -28,6 +28,10 @@ class Settings(BaseSettings):
     jwt_algorithm: str = Field(default="HS256")
     jwt_expire_minutes: int = Field(default=60 * 8)
 
+    # Google Identity Services (user-portal login only). Empty = Google login
+    # disabled; frontend hides the button and backend answers 503.
+    google_client_id: str = Field(default="")
+
     # Comma-separated; production origin(s) set via CORS_ORIGINS.
     cors_origins: str = Field(default="http://localhost:5173,http://localhost:3000")
 

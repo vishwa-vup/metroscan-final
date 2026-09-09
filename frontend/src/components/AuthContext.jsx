@@ -24,7 +24,8 @@ export function useAuth() {
 }
 
 function toAuth(body) {
-  return { access_token: body.access_token, role: body.role, email: body.email };
+  return { access_token: body.access_token, role: body.role, email: body.email,
+    business_id: body.business_id ?? null };
 }
 
 export function AuthProvider({ children }) {

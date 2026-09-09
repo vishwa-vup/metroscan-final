@@ -123,7 +123,10 @@ def save_scan(rec) -> bool:
 
 def load_scan(scan_id: str):
     """Rebuild a ScanRecord from DB rows (post-restart hydration). None if absent."""
-    from app.ocr.schemas import OcrResult, OcrToken
+    # Alias: the schema OcrToken (pydantic) must not shadow the db OcrToken
+    # used in s.query() below (shadowing crashes with ArgumentError).
+    from app.ocr.schemas import OcrResult
+    from app.ocr.schemas import OcrToken as OcrTokenSchema
     from app.services.scan_pipeline import ScanRecord, get_store
 
     if not db_available():
@@ -133,7 +136,7 @@ def load_scan(scan_id: str):
         row = s.get(Scan, scan_id)
         if row is None:
             return None
-        toks = [OcrToken(text=t.text, confidence=t.confidence,
+        toks = [OcrTokenSchema(text=t.text, confidence=t.confidence,
                          box=[t.x1, t.y1, t.x2, t.y2],
                          box_convention="xyxy-top-left-origin", index=t.idx)
                 for t in s.query(OcrToken).filter_by(scan_id=scan_id).order_by(OcrToken.idx)]

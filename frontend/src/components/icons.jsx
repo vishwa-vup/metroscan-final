@@ -56,6 +56,9 @@ export const I = {
   clock: (
     <Base><circle cx="12" cy="12" r="8" /><path d="M12 7v5l3 2" /></Base>
   ),
+  profile: (
+    <Base><circle cx="12" cy="8" r="3.5" /><path d="M5 20c1.5-3.5 4-5 7-5s5.5 1.5 7 5" /></Base>
+  ),
 };
 
 export function Icon({ name, className = "" }) {

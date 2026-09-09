@@ -2,6 +2,7 @@ import { Link, Route, Routes } from "react-router-dom";
 import AppShell from "./components/AppShell.jsx";
 import { AuthProvider, RequireAuth, RequireRole, Unauthorized } from "./components/AuthContext.jsx";
 import { AuthGuard, RoleGuard } from "./components/AuthGuard.jsx";
+import ErrorBoundary from "./components/ErrorBoundary.jsx";
 import { Icon } from "./components/icons.jsx";
 import { Card, PrimaryLink, SecondaryLink } from "./components/ui.jsx";
 import Capture from "./pages/Capture.jsx";
@@ -9,6 +10,7 @@ import Dashboard from "./pages/Dashboard.jsx";
 import { InspectorLogin, UserLogin } from "./pages/Logins.jsx";
 import Placeholder from "./pages/Placeholder.jsx";
 import PortalSelect from "./pages/PortalSelect.jsx";
+import Profile from "./pages/Profile.jsx";
 import ReportPage from "./pages/ReportPage.jsx";
 import Review from "./pages/Review.jsx";
 import ScanDetail from "./pages/ScanDetail.jsx";
@@ -33,6 +35,7 @@ export default function App() {
   return (
     <AuthProvider>
       <AppShell>
+        <ErrorBoundary>
         <Routes>
           <Route path="/login" element={<PortalSelect />} />
           <Route path="/user/login" element={<UserLogin />} />
@@ -43,6 +46,8 @@ export default function App() {
           <Route path="/user/scans" element={<RequireAuth><Scans /></RequireAuth>} />
           <Route path="/user/scan/:id" element={<RequireAuth><ScanDetail /></RequireAuth>} />
           <Route path="/user/reports/:id" element={<RequireAuth><ReportPage /></RequireAuth>} />
+          <Route path="/user/profile" element={<RequireAuth><Profile /></RequireAuth>} />
+          <Route path="/profile" element={<RequireAuth><Profile /></RequireAuth>} />
           <Route path="/capture" element={<AuthGuard><Capture /></AuthGuard>} />
           <Route path="/upload" element={<AuthGuard><Upload /></AuthGuard>} />
           <Route path="/scan/:id" element={<AuthGuard><ScanDetail /></AuthGuard>} />
@@ -87,6 +92,7 @@ export default function App() {
         />
           <Route path="*" element={<NotFound />} />
         </Routes>
+        </ErrorBoundary>
       </AppShell>
     </AuthProvider>
   );

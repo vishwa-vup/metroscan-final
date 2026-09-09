@@ -1,11 +1,14 @@
 import { useEffect, useState } from "react";
 import { api } from "../api/client.js";
+import { isStaffRole, useAuth } from "../components/AuthContext.jsx";
 import DashboardCards, { IssueBreakdown, ScanTable } from "../components/Dashboard.jsx";
 import { CardSkeleton, EmptyState, ErrorBanner, LoadingState } from "../components/feedback.jsx";
 import { Icon } from "../components/icons.jsx";
 import { Card, PageHeader, PrimaryLink, SecondaryLink } from "../components/ui.jsx";
 
 export default function Dashboard() {
+  const { role } = useAuth();
+  const userPortal = !isStaffRole(role);
   const [summary, setSummary] = useState(null);
   const [recent, setRecent] = useState(null);
   const [error, setError] = useState("");
@@ -16,15 +19,20 @@ export default function Dashboard() {
   }, []);
 
   const isEmpty = summary && (summary.total_scans ?? 0) === 0;
+  const scanTo = userPortal ? "/user/scan" : "/capture";
+  const uploadTo = userPortal ? "/user/upload" : "/upload";
+  const scansTo = userPortal ? "/user/scans" : "/scans";
 
   return (
     <div className="space-y-4">
       <PageHeader
-        title="Dashboard"
-        sub="Inspection overview for today — machine findings stay separate from inspector-confirmed results."
+        title={userPortal ? "Welcome back" : "Dashboard"}
+        sub={userPortal
+          ? "Review your recent scans and start a new product scan."
+          : "Inspection overview for today — machine findings stay separate from inspector-confirmed results."}
         actions={<>
-          <SecondaryLink to="/upload"><Icon name="upload" /> Upload</SecondaryLink>
-          <PrimaryLink to="/capture"><Icon name="plus" /> New scan</PrimaryLink>
+          <SecondaryLink to={uploadTo}><Icon name="upload" /> Upload Image</SecondaryLink>
+          <PrimaryLink to={scanTo}><Icon name="plus" /> Scan Product</PrimaryLink>
         </>}
       />
       {error && <ErrorBanner title="Dashboard failed to load" message={error} />}
@@ -54,14 +62,14 @@ export default function Dashboard() {
           title="No scans yet — ready for your first label"
           icon="capture"
           what="Capture or upload a product label. Quality check, OCR, extraction and rule analysis run automatically, then results appear here."
-          actionTo="/capture"
-          actionLabel="Scan your first label"
+          actionTo={scanTo}
+          actionLabel="Start your first scan"
         />
       )}
       <div className="space-y-2">
         <div className="flex items-center justify-between gap-2">
           <h2 className="text-base font-semibold tracking-tight text-ink">Recent scans</h2>
-          <SecondaryLink to="/scans" className="h-9 px-3 text-[13px]">View all</SecondaryLink>
+          <SecondaryLink to={scansTo} className="h-9 px-3 text-[13px]">View all</SecondaryLink>
         </div>
         {!recent && !isEmpty && <LoadingState what="Loading recent scans…" />}
         {recent && <ScanTable items={recent.items?.slice(0, 5)} />}

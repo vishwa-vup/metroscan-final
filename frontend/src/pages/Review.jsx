@@ -5,6 +5,7 @@ import OcrFieldList from "../components/OcrFieldList.jsx";
 import RuleFindingCard from "../components/RuleFindingCard.jsx";
 import { ErrorBanner, LoadingState } from "../components/feedback.jsx";
 import { Card, PageHeader, SectionTitle, TextLink } from "../components/ui.jsx";
+import { formatDate } from "../utils/format.js";
 import { useParams } from "react-router-dom";
 
 // Review page §28 route /review/:id (Phase 4): evidence-first inspector workflow.
@@ -52,7 +53,7 @@ export default function Review() {
           <SectionTitle>Review history</SectionTitle>
           <ul className="mt-2 space-y-1 text-sm text-slate-600">
             {scan.reviews.map((r, i) => (
-              <li key={i} className="tnum">{r.at} — {r.reviewer} {r.action}ed {r.rule_id} ({r.prev_status} → {r.new_status})</li>
+              <li key={i} className="tnum">{formatDate(r.at)} — {r.reviewer} {r.action}ed {r.rule_id} ({r.prev_status} → {r.new_status})</li>
             ))}
           </ul>
         </Card>

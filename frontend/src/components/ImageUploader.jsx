@@ -9,7 +9,7 @@ import { Card, PrimaryButton, SecondaryButton, SectionTitle } from "./ui.jsx";
 const MAX_MB = 10;
 const ACCEPT = "image/jpeg,image/png,image/webp";
 
-export default function ImageUploader({ onResult, onRejected }) {
+export default function ImageUploader({ onResult, onRejected, completed = false }) {
   const [file, setFile] = useState(null);
   const [preview, setPreview] = useState(null);
   const [drag, setDrag] = useState(false);
@@ -74,10 +74,28 @@ export default function ImageUploader({ onResult, onRejected }) {
   }
 
   const mb = file ? (file.size / 1048576).toFixed(2) : null;
+  // Real frontend states only: select → preview → analyze → result.
+  const stage = completed ? 4 : busy ? 3 : preview ? 2 : 1;
+  const STAGES = ["Select image", "Preview", "Analyze", "Result"];
 
   return (
     <Card>
       <SectionTitle aside={<span className="text-xs text-muted">Max {MAX_MB} MB</span>}>Product label image</SectionTitle>
+      <ol aria-label="Upload progress" className="mt-3 flex items-center gap-1">
+        {STAGES.map((s, i) => {
+          const n = i + 1;
+          const done = n < stage;
+          const current = n === stage;
+          return (
+            <li key={s} className="flex min-w-0 flex-1 items-center gap-1.5" aria-current={current ? "step" : undefined}>
+              <span aria-hidden="true" className={`tnum flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[11px] font-bold ${done ? "bg-emerald-600 text-white" : current ? "bg-brand-primary text-white" : "bg-slate-200 text-slate-500"}`}>
+                {done ? "✓" : n}
+              </span>
+              <span className={`truncate text-xs ${current || done ? "font-semibold text-ink" : "text-muted"}`}>{s}</span>
+            </li>
+          );
+        })}
+      </ol>
       <div
         role="button"
         tabIndex={0}

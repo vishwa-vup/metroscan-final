@@ -18,6 +18,7 @@ export default function Upload() {
         <ImageUploader
           onResult={(s) => { setScan(s); setRejected(null); }}
           onRejected={(r) => { setRejected(r); setScan(null); }}
+          completed={Boolean(scan || rejected)}
         />
         <Card>
           <h2 className="text-base font-semibold tracking-tight text-ink">What happens next</h2>

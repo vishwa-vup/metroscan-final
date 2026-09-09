@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { downloadReport } from "../api/client.js";
+import { formatDate } from "../utils/format.js";
 import { EmptyState } from "./feedback.jsx";
 import { Icon } from "./icons.jsx";
 import StatusBadge from "./StatusBadge.jsx";
@@ -142,7 +143,7 @@ export function ScanTable({ items }) {
                     : <span className="text-xs text-muted">{s.processing_state}</span>}
                 </span>
               </td>
-              <td className="tnum whitespace-nowrap px-4 py-2.5 text-slate-600">{(s.created_at || "").slice(0, 10)}</td>
+              <td className="tnum whitespace-nowrap px-4 py-2.5 text-slate-600">{formatDate(s.created_at)}</td>
               <td className="whitespace-nowrap px-4 py-2.5 text-right">
                 <Link className="mr-3 font-semibold text-brand-primary underline-offset-2 hover:underline" to={`/scan/${s.scan_id}`}>Detail</Link>
                 <Link className="font-semibold text-brand-primary underline-offset-2 hover:underline" to={`/review/${s.scan_id}`}>Review</Link>

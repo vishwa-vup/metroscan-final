@@ -9,6 +9,7 @@ const STAFF_NAV = [
   ["/scans", "Inspection Queue", "scans"],
   ["/capture", "Capture", "capture"],
   ["/upload", "Upload", "upload"],
+  ["/profile", "Profile", "profile"],
 ];
 
 // User portal: only self-service destinations (backend scopes business users
@@ -18,6 +19,7 @@ const USER_NAV = [
   ["/user/scan", "Scan Product", "capture"],
   ["/user/upload", "Upload Image", "upload"],
   ["/user/scans", "My Scans", "scans"],
+  ["/user/profile", "Profile", "profile"],
 ];
 
 function sideCls({ isActive }) {

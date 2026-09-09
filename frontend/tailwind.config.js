@@ -1,6 +1,6 @@
 /** @type {import('tailwindcss').Config} */
-// MetroScan design tokens (frontend-only redesign v1.0):
-// navy chrome, indigo primary, semantic status colors. No backend impact.
+// MetroScan design tokens (flat SaaS): navy chrome, professional blue
+// primary, teal inspector accent, semantic status colors. No backend impact.
 export default {
   content: ["./index.html", "./src/**/*.{js,jsx}"],
   theme: {
@@ -9,9 +9,9 @@ export default {
         brand: {
           navy: "#081224",
           navy2: "#0e1d33",
-          primary: "#5B5CEB",
-          primaryDark: "#4a4dd6",
-          highlight: "#7C6FFF",
+          primary: "#2563EB",
+          primaryDark: "#1D4ED8",
+          highlight: "#60A5FA",
         },
         canvas: "#F5F7FB",
         ink: "#111827",

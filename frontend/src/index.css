@@ -2,14 +2,14 @@
 @tailwind components;
 @tailwind utilities;
 
-/* MetroScan design system v1.0 (frontend-only).
-   Tokens: navy chrome, indigo primary, cool-gray canvas.
+/* MetroScan flat SaaS design system.
+   Tokens: navy chrome, professional blue primary, cool-gray canvas.
    System type preserved; focus + reduced-motion + skeleton included. */
 
 :root {
   --ms-navy: #081224;
-  --ms-primary: #5b5ceb;
-  --ms-highlight: #7c6fff;
+  --ms-primary: #2563eb;
+  --ms-highlight: #60a5fa;
   --ms-canvas: #f5f7fb;
   --ms-ink: #111827;
   --ms-muted: #64748b;

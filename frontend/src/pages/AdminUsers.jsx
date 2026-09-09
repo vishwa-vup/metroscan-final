@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { api } from "../api/client.js";
 import { ErrorBanner } from "../components/feedback.jsx";
-import { Card, Field, PageHeader, PrimaryButton, SectionTitle, SelectInput, TextInput, TextLink } from "../components/ui.jsx";
+import { Field, PageHeading, PrimaryButton, SelectInput, TextInput, TextLink } from "../components/ui.jsx";
 
 export default function AdminUsers() {
   const [users, setUsers] = useState([]);
@@ -25,24 +25,37 @@ export default function AdminUsers() {
 
   return (
     <div className="space-y-4">
-      <PageHeader title="Admin users" sub="Manage inspectors, businesses and admins." actions={<TextLink to="/admin/rules">Rule versions →</TextLink>} />
+      <PageHeading
+        kicker="Administration / Accounts"
+        title={`User accounts — ${users.length}`}
+        actions={<TextLink to="/admin/rules">Rule versions →</TextLink>}
+      />
       <ErrorBanner message={error} />
-      <div className="grid gap-4 lg:grid-cols-2">
-        <Card>
-          <SectionTitle aside={<span className="tnum text-xs text-slate-500">{users.length}</span>}>Existing users</SectionTitle>
-          <ul className="mt-3 divide-y divide-slate-100 text-sm">
-            {users.map((u) => (
-              <li key={u.id} className="flex items-center justify-between gap-2 py-2">
-                <span className="truncate font-medium">{u.email}</span>
-                <span className="shrink-0 rounded-full bg-slate-100 px-2 py-0.5 text-xs text-slate-700">
-                  {u.role}{u.business_id ? ` · business #${u.business_id}` : ""}
-                </span>
-              </li>
-            ))}
-          </ul>
-        </Card>
-        <Card>
-          <SectionTitle>Create user</SectionTitle>
+      <div className="grid gap-8 lg:grid-cols-[60%_40%]">
+        <section aria-label="Existing users">
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[420px] border-collapse text-sm">
+              <thead>
+                <tr className="border-b border-ink text-left text-[11px] font-bold uppercase tracking-[0.1em] text-faint">
+                  <th scope="col" className="py-2 pr-4 font-bold">Email</th>
+                  <th scope="col" className="py-2 pr-4 font-bold">Role</th>
+                  <th scope="col" className="py-2 text-right font-bold">Workspace</th>
+                </tr>
+              </thead>
+              <tbody>
+                {users.map((u) => (
+                  <tr key={u.id} className="border-b border-rule last:border-b-0 hover:bg-tone/60">
+                    <td className="max-w-[260px] truncate py-2 pr-4 font-medium text-ink">{u.email}</td>
+                    <td className="py-2 pr-4 text-[13px] capitalize text-muted">{u.role}</td>
+                    <td className="tnum py-2 text-right text-[13px] text-muted">{u.business_id ? `#${u.business_id}` : "—"}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </section>
+        <section aria-label="Create user" className="h-fit rounded-lg border border-rule bg-surface p-4">
+          <h2 className="text-base font-bold tracking-tight text-ink">Create user</h2>
           <form className="mt-3 space-y-3" onSubmit={create}>
             <Field label="Email">
               <TextInput placeholder="user@example.com" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
@@ -64,7 +77,7 @@ export default function AdminUsers() {
             )}
             <PrimaryButton type="submit">Create user</PrimaryButton>
           </form>
-        </Card>
+        </section>
       </div>
     </div>
   );

@@ -3,8 +3,7 @@ import AppShell from "./components/AppShell.jsx";
 import { AuthProvider, RequireAuth, RequireRole, Unauthorized } from "./components/AuthContext.jsx";
 import { AuthGuard, RoleGuard } from "./components/AuthGuard.jsx";
 import ErrorBoundary from "./components/ErrorBoundary.jsx";
-import { Icon } from "./components/icons.jsx";
-import { Card, PrimaryLink, SecondaryLink } from "./components/ui.jsx";
+import { PrimaryLink } from "./components/ui.jsx";
 import Capture from "./pages/Capture.jsx";
 import Dashboard from "./pages/Dashboard.jsx";
 import { InspectorLogin, UserLogin } from "./pages/Logins.jsx";
@@ -20,8 +19,9 @@ import AdminUsers from "./pages/AdminUsers.jsx";
 
 function NotFound() {
   return (
-    <div className="mx-auto max-w-md rounded-card border border-slate-200 bg-white p-6 text-center shadow-card">
-      <p className="text-base font-semibold text-ink">Page not found</p>
+    <div className="mx-auto max-w-md border-t-2 border-ink px-1 py-8">
+      <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-faint">404</p>
+      <p className="mt-1 text-xl font-bold tracking-tight text-ink">Page not found</p>
       <p className="mt-1 text-sm text-muted">The link may be wrong. Continue from your portal instead.</p>
       <p className="mt-3"><Link to="/login" className="font-semibold text-brand-primary hover:underline">Go to portal selection</Link></p>
     </div>
@@ -61,33 +61,36 @@ export default function App() {
         <Route
           path="/"
           element={
-            <Card className="overflow-hidden p-0">
-              <div className="bg-brand-navy px-6 py-10 text-white sm:px-10">
-                <p className="text-xs font-semibold uppercase tracking-widest text-brand-highlight">SIH26034 · Decision support only</p>
-                <h1 className="mt-1 text-3xl font-bold tracking-tight sm:text-4xl">MetroScan</h1>
-                <p className="mt-2 max-w-xl text-sm leading-relaxed text-slate-300">
-                  AI-assisted Legal Metrology compliance scanner.
-                  Potential non-compliance, pending inspector review. Never an autonomous legal verdict.
-                </p>
-                <div className="mt-5 flex flex-wrap gap-2">
-                  <PrimaryLink to="/login"><Icon name="capture" /> Scan Product</PrimaryLink>
-                  <SecondaryLink to="/user/upload" className="border-white/25 bg-transparent text-white hover:bg-white/10"><Icon name="upload" /> Upload Image</SecondaryLink>
-                  <SecondaryLink to="/login" className="border-white/25 bg-transparent text-white hover:bg-white/10"><Icon name="dashboard" /> Choose Portal</SecondaryLink>
-                </div>
+            <div className="mx-auto max-w-3xl pb-4 pt-6 sm:pt-10">
+              <p className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.18em] text-faint">
+                <span aria-hidden="true" className="inline-block h-2 w-2 bg-brand-primary" />
+                MetroScan · Inspection intelligence
+              </p>
+              <h1 className="mt-3 text-4xl font-bold leading-[1.08] tracking-tight text-ink sm:text-5xl">
+                Packaged-commodity compliance, inspected properly.
+              </h1>
+              <p className="mt-3 max-w-xl text-[15px] leading-relaxed text-muted">
+                Photograph a label. MetroScan extracts the declarations, checks them
+                against configured rules, and files everything as evidence for
+                inspector review.
+              </p>
+              <div className="mt-5">
+                <PrimaryLink to="/login" className="h-11 px-6">Open portal</PrimaryLink>
               </div>
-              <div className="grid gap-3 p-6 sm:grid-cols-3">
+              <dl className="mt-10 grid gap-6 border-t-2 border-ink pt-5 sm:grid-cols-3">
                 {[
-                  ["1 · Capture", "Phone camera or gallery — quality gate stops poor shots early."],
-                  ["2 · Verify", "OCR + rules with confidence, clauses and evidence beside the photo."],
-                  ["3 · Decide", "Inspectors confirm or clear; reports export to PDF and DOCX."],
-                ].map(([t, d]) => (
-                  <div key={t} className="rounded-card border border-slate-200 bg-slate-50 p-4">
-                    <p className="text-sm font-semibold text-ink">{t}</p>
-                    <p className="mt-1 text-sm leading-relaxed text-muted">{d}</p>
+                  ["01 · Capture", "Evidence image", "Camera or file upload with a quality gate up front."],
+                  ["02 · Analyse", "OCR + extraction + rules", "Declarations, confidence scores, and cited clauses."],
+                  ["03 · Review", "Inspector confirmation", "A person confirms or clears every finding."],
+                ].map(([k, t, d]) => (
+                  <div key={k}>
+                    <dt className="text-[11px] font-bold uppercase tracking-[0.14em] text-faint">{k}</dt>
+                    <dd className="mt-1 text-[15px] font-bold text-ink">{t}</dd>
+                    <dd className="mt-0.5 text-sm leading-relaxed text-muted">{d}</dd>
                   </div>
                 ))}
-              </div>
-            </Card>
+              </dl>
+            </div>
           }
         />
           <Route path="*" element={<NotFound />} />

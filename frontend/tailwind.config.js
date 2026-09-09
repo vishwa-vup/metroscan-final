@@ -1,34 +1,53 @@
 /** @type {import('tailwindcss').Config} */
-// MetroScan design tokens (flat SaaS): navy chrome, professional blue
-// primary, teal inspector accent, semantic status colors. No backend impact.
+// MetroScan operational-editorial tokens (frontend-only):
+// ink/paper/rules, restrained blue action, muted semantic colors.
+// Flat surfaces, sharp radii, shadows only for overlays.
 export default {
   content: ["./index.html", "./src/**/*.{js,jsx}"],
   theme: {
     extend: {
       colors: {
         brand: {
-          navy: "#081224",
-          navy2: "#0e1d33",
-          primary: "#2563EB",
-          primaryDark: "#1D4ED8",
-          highlight: "#60A5FA",
+          navy: "#10151C",
+          navy2: "#1A212B",
+          primary: "#1D4ED8",
+          primaryDark: "#1E40AF",
+          highlight: "#3B82F6",
         },
-        canvas: "#F5F7FB",
-        ink: "#111827",
-        muted: "#64748B",
-        ok: "#20C997",
-        warn: "#F5B942",
-        bad: "#EF5B6B",
+        paper: "#F6F5F1",
+        canvas: "#F6F5F1",
+        surface: "#FFFFFF",
+        tone: "#EFEDE7",
+        ink: "#1A1D21",
+        muted: "#5C6470",
+        faint: "#8A919C",
+        rule: "#E0DED6",
+        ok: "#2E7D4F",
+        okSoft: "#E7F2EB",
+        warn: "#92600A",
+        warnSoft: "#FAF0D7",
+        bad: "#B3261E",
+        badSoft: "#F9E8E6",
       },
       boxShadow: {
-        card: "0 1px 2px rgba(16,24,40,.06), 0 1px 3px rgba(16,24,40,.08)",
-        pop: "0 8px 24px rgba(8,18,36,.16)",
+        card: "none",
+        pop: "0 8px 24px rgba(16,21,28,.16)",
       },
       borderRadius: {
-        card: "12px",
+        card: "8px",
       },
       maxWidth: {
-        shell: "72rem",
+        shell: "80rem",
+      },
+      fontFamily: {
+        sans: [
+          "Inter", "ui-sans-serif", "system-ui", "-apple-system", '"Segoe UI"',
+          "Roboto", '"Helvetica Neue"', "Arial", "sans-serif",
+        ],
+        mono: [
+          "ui-monospace", "SFMono-Regular", "Menlo", "Consolas",
+          '"Liberation Mono"', "monospace",
+        ],
       },
     },
   },

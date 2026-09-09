@@ -1,24 +1,27 @@
 import { useState } from "react";
+import { useLocation } from "react-router-dom";
 import CameraCapture from "../components/CameraCapture.jsx";
-import { Card, PageHeader, SecondaryLink } from "../components/ui.jsx";
+import { PageHeading, SecondaryLink, TextLink } from "../components/ui.jsx";
 
 export default function Capture() {
+  const { pathname } = useLocation();
+  const userPortal = pathname.startsWith("/user");
   const [captured, setCaptured] = useState(false);
   return (
-    <div className="space-y-4">
-      <PageHeader
-        title="Capture a label"
-        sub="Document-scanner style capture with gallery fallback. Works in the browser — no native app."
-        actions={<SecondaryLink to="/upload">Prefer file upload?</SecondaryLink>}
+    <div className="mx-auto w-full max-w-3xl space-y-4">
+      <PageHeading
+        kicker="Field action / Capture"
+        title="Capture label"
+        actions={<SecondaryLink to={userPortal ? "/user/upload" : "/upload"} className="h-8 px-3 text-[13px]">File upload instead</SecondaryLink>}
       />
       <CameraCapture onCapture={() => setCaptured(true)} />
-      <Card className="border-slate-200 bg-slate-50">
-        <p className="text-[13px] leading-relaxed text-slate-600">
-          {captured
-            ? "Image captured locally. Upload it from the Upload page to run the quality gate, OCR and rule analysis."
-            : "No image yet — start the camera or choose from the gallery."}
-        </p>
-      </Card>
+      <p className="border-t border-rule pt-3 text-[13px] leading-relaxed text-muted">
+        {captured ? (
+          <>Image captured on this device. <TextLink to={userPortal ? "/user/upload" : "/upload"}>Upload it</TextLink> to run quality gate, OCR and rule analysis.</>
+        ) : (
+          "No image yet — start the camera or choose from the gallery."
+        )}
+      </p>
     </div>
   );
 }

@@ -2,35 +2,45 @@ import { useState } from "react";
 import { API_BASE, api } from "../api/client.js";
 import { AuthImg } from "./AuthImg.jsx";
 import { ErrorBanner } from "./feedback.jsx";
-import { Card, DangerButton, Field, SecondaryButton, SectionTitle, SuccessButton, TextInput } from "./ui.jsx";
+import { DangerButton, Field, SecondaryButton, SuccessButton, TextInput } from "./ui.jsx";
 
-// EvidenceViewer §28: original image prominent + evidence regions listed.
-// Level 2 toggle: annotated copy with finding boxes (original never modified).
+// Evidence frame: the image is the primary artifact. Segmented
+// Original/Annotated control; annotated copy never modifies the original.
 export default function EvidenceViewer({ scanId, boxes }) {
   const [annotated, setAnnotated] = useState(false);
   return (
-    <Card>
-      <SectionTitle aside={
-        <SecondaryButton className="px-3 py-1 text-xs" onClick={() => setAnnotated(!annotated)}>
-          {annotated ? "Show original" : "Show annotated evidence"}
-        </SecondaryButton>
-      }>
-        Label evidence
-      </SectionTitle>
-      <figure className="mt-3">
+    <figure className="min-w-0">
+      <div role="group" aria-label="Evidence view" className="flex border-b border-rule">
+        {[["Original", false], ["Annotated", true]].map(([label, on]) => (
+          <button
+            key={label}
+            type="button"
+            aria-pressed={annotated === on}
+            onClick={() => setAnnotated(on)}
+            className={`-mb-px border-b-2 px-3 py-2 text-[13px] font-bold ${
+              annotated === on ? "border-ink text-ink" : "border-transparent text-faint hover:text-muted"
+            }`}
+          >
+            {label}
+          </button>
+        ))}
+        <span className="tnum ml-auto self-center font-mono text-xs text-faint">
+          {(boxes || []).length} regions
+        </span>
+      </div>
+      <div className="border border-rule bg-brand-navy p-1.5">
         <AuthImg
           src={annotated ? `${API_BASE}/api/v1/scans/${scanId}/evidence/annotated` : `${API_BASE}/api/v1/scans/${scanId}/evidence`}
           alt="Original label evidence — machine findings shown beside it, never over it"
-          className="max-h-[480px] w-full rounded-lg border border-slate-200 bg-slate-950 object-contain"
+          className="max-h-[520px] w-full rounded-[4px] object-contain"
         />
-        <figcaption className="mt-2 text-xs text-slate-500">
-          {(boxes || []).length} evidence region(s)
-          {(boxes || []).map((b, i) => (
-            <span key={i} className="tnum font-mono"> [{b.join(", ")}]</span>
-          ))}
-        </figcaption>
-      </figure>
-    </Card>
+      </div>
+      <figcaption className="tnum mt-1.5 font-mono text-[11px] leading-relaxed text-faint">
+        {(boxes || []).map((b, i) => (
+          <span key={i} className="mr-2">E{String(i + 1).padStart(2, "0")} [{b.join(", ")}]</span>
+        ))}
+      </figcaption>
+    </figure>
   );
 }
 
@@ -63,7 +73,7 @@ export function InspectorReviewPanel({ finding, onReviewed }) {
   }
 
   return (
-    <div className="space-y-2 rounded-xl border border-slate-200 bg-slate-50 p-3">
+    <div className="space-y-2 border border-rule bg-paper p-3">
       <div className="grid gap-2 sm:grid-cols-2">
         <Field label="Reviewer display name (optional — login identity is recorded)">
           <TextInput
@@ -76,17 +86,18 @@ export function InspectorReviewPanel({ finding, onReviewed }) {
           <TextInput
             value={note}
             onChange={(e) => setNote(e.target.value)}
-            placeholder="checked against original photo…"
+            placeholder="Checked against original photo…"
           />
         </Field>
       </div>
-      <div className="flex flex-wrap gap-2">
+      <div className="flex flex-wrap items-center gap-2">
         <DangerButton disabled={busy} onClick={() => act("confirm")}>
-          Confirm issue
+          {busy ? "Recording…" : "Confirm issue"}
         </DangerButton>
         <SuccessButton disabled={busy} onClick={() => act("clear")}>
-          Clear
+          {busy ? "Recording…" : "Clear finding"}
         </SuccessButton>
+        <span className="text-xs text-faint">Decisions are timestamped and auditable.</span>
       </div>
       <ErrorBanner message={error} />
     </div>

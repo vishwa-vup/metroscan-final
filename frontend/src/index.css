@@ -2,21 +2,22 @@
 @tailwind components;
 @tailwind utilities;
 
-/* MetroScan flat SaaS design system.
-   Tokens: navy chrome, professional blue primary, cool-gray canvas.
-   System type preserved; focus + reduced-motion + skeleton included. */
+/* MetroScan operational-editorial system (frontend-only).
+   Ink/paper/rules, restrained blue action, muted semantic color.
+   Type: system stack with Inter preferred when installed. */
 
 :root {
-  --ms-navy: #081224;
-  --ms-primary: #2563eb;
-  --ms-highlight: #60a5fa;
-  --ms-canvas: #f5f7fb;
-  --ms-ink: #111827;
-  --ms-muted: #64748b;
-  --ms-ok: #20c997;
-  --ms-warn: #f5b942;
-  --ms-bad: #ef5b6b;
-  --ms-radius: 12px;
+  --ms-navy: #10151c;
+  --ms-primary: #1d4ed8;
+  --ms-highlight: #3b82f6;
+  --ms-paper: #f6f5f1;
+  --ms-ink: #1a1d21;
+  --ms-muted: #5c6470;
+  --ms-rule: #e0ded6;
+  --ms-ok: #2e7d4f;
+  --ms-warn: #92600a;
+  --ms-bad: #b3261e;
+  --ms-radius: 8px;
 }
 
 @layer base {
@@ -24,18 +25,16 @@
     -webkit-text-size-adjust: 100%;
   }
   body {
-    @apply bg-canvas text-ink antialiased;
-    font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
-      "Helvetica Neue", Arial, sans-serif;
+    @apply bg-paper text-ink antialiased;
     line-height: 1.5;
   }
   :focus-visible {
     outline: 2px solid var(--ms-primary);
     outline-offset: 2px;
-    border-radius: 4px;
+    border-radius: 3px;
   }
   ::selection {
-    background: #c7d2fe;
+    background: #dbe4f5;
   }
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after {
@@ -53,7 +52,7 @@
   .ms-skeleton {
     position: relative;
     overflow: hidden;
-    background: #e8edf5;
+    background: #e7e4da;
   }
   .ms-skeleton::after {
     content: "";

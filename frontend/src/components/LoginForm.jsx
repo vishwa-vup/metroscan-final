@@ -5,8 +5,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { homeFor, pathAllowedFor, useAuth } from "./AuthContext.jsx";
 import { ErrorBanner } from "./feedback.jsx";
 import GoogleSignIn, { googleConfigured } from "./GoogleSignIn.jsx";
-import { Icon } from "./icons.jsx";
-import { Card, Field, PrimaryButton, TextInput } from "./ui.jsx";
+import { Field, PrimaryButton, TextInput } from "./ui.jsx";
 
 export default function LoginForm({ portal, title, subtitle, google = false }) {
   const { login, googleLogin } = useAuth();
@@ -56,18 +55,39 @@ export default function LoginForm({ portal, title, subtitle, google = false }) {
   }
 
   const showGoogle = google && portal === "user" && googleConfigured();
+  const steps = portal === "user"
+    ? ["Capture a label", "Follow the analysis", "Keep your history"]
+    : ["Open the queue", "Weigh the evidence", "Record the decision"];
 
   return (
-    <div className="mx-auto w-full max-w-md px-4 pt-8">
-      <div className="mb-5 text-center">
-        <span aria-hidden="true" className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-brand-navy text-lg font-bold text-white">
-          M
-        </span>
-        <h1 className="mt-3 text-2xl font-bold tracking-tight text-ink">{title}</h1>
-        <p className="mt-1 text-sm text-muted">{subtitle}</p>
-      </div>
-      <Card>
-        <form className="space-y-3" onSubmit={submit}>
+    <div className="mx-auto w-full max-w-4xl px-4 pt-6 sm:pt-10">
+      <div className="grid gap-8 md:grid-cols-[1fr_380px]">
+        <div className="pt-1">
+          <p className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.18em] text-faint">
+            <span aria-hidden="true" className="inline-block h-2 w-2 bg-brand-primary" />
+            Metroscan
+          </p>
+          <h1 className="mt-2 text-3xl font-bold tracking-tight text-ink">{title}</h1>
+          <p className="mt-1 max-w-sm text-sm leading-relaxed text-muted">{subtitle}</p>
+          <ol className="mt-6 space-y-0 border-t border-rule">
+            {steps.map((s, i) => (
+              <li key={s} className="flex items-baseline gap-3 border-b border-rule py-2.5 text-sm">
+                <span aria-hidden="true" className="tnum text-xs font-bold text-faint">0{i + 1}</span>
+                <span className="font-medium text-ink">{s}</span>
+              </li>
+            ))}
+          </ol>
+          <p className="mt-4 max-w-sm text-xs leading-relaxed text-faint">
+            Decision support only. Automated analysis never replaces inspector review.
+          </p>
+          <p className="mt-3 text-sm">
+            <Link to="/login" className="font-semibold text-brand-primary hover:underline">
+              ← Portal selection
+            </Link>
+          </p>
+        </div>
+        <div className="rounded-lg border border-rule bg-surface p-5 sm:p-6">
+          <form className="space-y-3" onSubmit={submit}>
           <Field label="Email">
             <TextInput
               type="email"
@@ -115,13 +135,8 @@ export default function LoginForm({ portal, title, subtitle, google = false }) {
           </>
         )}
         <div className="mt-3"><ErrorBanner title="Login failed" message={error} /></div>
-      </Card>
-      <p className="mt-4 text-center text-sm text-muted">
-        <Link to="/login" className="inline-flex items-center gap-1 font-semibold text-brand-primary hover:underline">
-          <Icon name="scans" className="[&_svg]:h-4 [&_svg]:w-4" />
-          Back to portal selection
-        </Link>
-      </p>
+      </div>
+      </div>
     </div>
   );
 }

@@ -1,10 +1,10 @@
 import { useRef, useState } from "react";
 import { ErrorBanner } from "./feedback.jsx";
 import { Icon } from "./icons.jsx";
-import { Card, PrimaryButton, SecondaryButton, SectionTitle } from "./ui.jsx";
+import { SecondaryButton } from "./ui.jsx";
 
-// CameraCapture v1.0 (frontend-only): same Camera API + gallery fallback,
-// professional dark stage with scanning-frame overlay + guidance + states.
+// Field inspection tool: full-bleed dark stage, framing guide, status line,
+// circular shutter + utility controls. Same Camera API + gallery behavior.
 export default function CameraCapture({ onCapture }) {
   const videoRef = useRef(null);
   const [stream, setStream] = useState(null);
@@ -48,6 +48,7 @@ export default function CameraCapture({ onCapture }) {
       if (!blob) return;
       const url = URL.createObjectURL(blob);
       setPhoto({ blob, url });
+      stopCamera();
       onCapture?.(blob);
     }, "image/jpeg", 0.92);
   }
@@ -66,76 +67,91 @@ export default function CameraCapture({ onCapture }) {
   }
 
   return (
-    <Card>
-      <SectionTitle aside={stream
-        ? <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-800"><span aria-hidden="true" className="h-1.5 w-1.5 rounded-full bg-emerald-500" />Live</span>
-        : <span className="inline-flex items-center gap-1.5 rounded-full bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-600">Idle</span>}>
-        Capture
-      </SectionTitle>
-
-      {/* Dark camera stage with scanning frame */}
-      <div className="relative mt-3 overflow-hidden rounded-card bg-brand-navy">
+    <div>
+      {/* Stage */}
+      <div className="relative overflow-hidden rounded-md bg-brand-navy">
+        <div className="flex h-8 items-center justify-between border-b border-white/10 px-3">
+          <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-slate-400">Declaration panel</p>
+          {stream && !photo && (
+            <p className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-[0.14em] text-red-400">
+              <span aria-hidden="true" className="h-1.5 w-1.5 animate-pulse rounded-full bg-red-500" /> Live
+            </p>
+          )}
+          {photo && (
+            <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-slate-400">Preview</p>
+          )}
+        </div>
         {!photo && (
           <>
             {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
-            <video ref={videoRef} className="max-h-[440px] min-h-[260px] w-full bg-brand-navy object-contain" playsInline muted aria-label="Live camera preview" />
-            {!stream && (
-              <div className="pointer-events-none absolute inset-0 flex items-center justify-center p-6">
-                <div className="relative h-44 w-64 max-w-[80%]">
-                  <span aria-hidden="true" className="absolute left-0 top-0 h-7 w-7 rounded-tl-lg border-l-[3px] border-t-[3px] border-white/70" />
-                  <span aria-hidden="true" className="absolute right-0 top-0 h-7 w-7 rounded-tr-lg border-r-[3px] border-t-[3px] border-white/70" />
-                  <span aria-hidden="true" className="absolute bottom-0 left-0 h-7 w-7 rounded-bl-lg border-b-[3px] border-l-[3px] border-white/70" />
-                  <span aria-hidden="true" className="absolute bottom-0 right-0 h-7 w-7 rounded-br-lg border-b-[3px] border-r-[3px] border-white/70" />
-                  <p className="absolute inset-0 flex items-center justify-center px-8 text-center text-[13px] leading-snug text-white/80">
-                    {unsupported ? "Camera unavailable here — use gallery instead." : "Start the camera, then fill this frame with the label."}
-                  </p>
-                </div>
+            <video ref={videoRef} className="h-[52vh] max-h-[480px] min-h-[300px] w-full bg-brand-navy object-cover" playsInline muted aria-label="Live camera preview" />
+            <div aria-hidden="true" className="pointer-events-none absolute inset-8 bottom-24 top-8 flex items-center justify-center">
+              <div className="relative h-full w-full max-w-md">
+                <span className="absolute left-0 top-0 h-6 w-6 border-l-2 border-t-2 border-white/80" />
+                <span className="absolute right-0 top-0 h-6 w-6 border-r-2 border-t-2 border-white/80" />
+                <span className="absolute bottom-0 left-0 h-6 w-6 border-b-2 border-l-2 border-white/80" />
+                <span className="absolute bottom-0 right-0 h-6 w-6 border-b-2 border-r-2 border-white/80" />
               </div>
-            )}
-            {stream && (
-              <div aria-hidden="true" className="pointer-events-none absolute inset-0 flex items-center justify-center p-6">
-                <div className="relative h-48 w-72 max-w-[85%]">
-                  <span className="absolute left-0 top-0 h-7 w-7 rounded-tl-lg border-l-[3px] border-t-[3px] border-brand-highlight" />
-                  <span className="absolute right-0 top-0 h-7 w-7 rounded-tr-lg border-r-[3px] border-t-[3px] border-brand-highlight" />
-                  <span className="absolute bottom-0 left-0 h-7 w-7 rounded-bl-lg border-b-[3px] border-l-[3px] border-brand-highlight" />
-                  <span className="absolute bottom-0 right-0 h-7 w-7 rounded-br-lg border-b-[3px] border-r-[3px] border-brand-highlight" />
-                </div>
+            </div>
+            {!stream && (
+              <div className="absolute inset-x-0 bottom-24 top-8 flex items-center justify-center p-6">
+                <p className="max-w-xs text-center text-[13px] leading-snug text-white/85">
+                  {unsupported
+                    ? "Camera unavailable here — use the gallery."
+                    : "Fit the complete declaration panel inside the frame."}
+                </p>
               </div>
             )}
           </>
         )}
         {photo && (
-          <img src={photo.url} alt="Captured label evidence" className="max-h-[440px] w-full bg-brand-navy object-contain" />
+          <img src={photo.url} alt="Captured label evidence" className="h-[52vh] max-h-[480px] min-h-[300px] w-full bg-brand-navy object-contain" />
         )}
+        {/* Control bar */}
+        <div className="flex items-center justify-between gap-2 border-t border-white/10 px-3 py-2.5">
+          {!photo ? (
+            <>
+              {!stream ? (
+                <button onClick={startCamera} className="h-10 rounded-md bg-surface px-4 text-sm font-bold text-ink hover:bg-white">
+                  Start camera
+                </button>
+              ) : (
+                <button
+                  onClick={takePhoto}
+                  aria-label="Capture photo"
+                  className="mx-auto h-14 w-14 rounded-full border-4 border-white/90 bg-surface shadow-pop transition-transform hover:scale-105 active:scale-95"
+                >
+                  <span aria-hidden="true" className="mx-auto block h-8 w-8 rounded-full bg-brand-primary" />
+                </button>
+              )}
+              <div className="flex items-center gap-2">
+                {stream && (
+                  <button onClick={stopCamera} className="h-10 rounded-md px-3 text-sm font-semibold text-slate-300 hover:bg-white/10 hover:text-white">
+                    Cancel
+                  </button>
+                )}
+                <label className="inline-flex h-10 cursor-pointer items-center gap-1.5 rounded-md border border-white/25 px-3 text-sm font-semibold text-white hover:bg-white/10">
+                  <Icon name="upload" className="[&_svg]:h-4 [&_svg]:w-4" />
+                  Gallery
+                  <input type="file" accept="image/*" className="sr-only" aria-label="Choose from gallery" onChange={onGallery} />
+                </label>
+              </div>
+            </>
+          ) : (
+            <>
+              <button onClick={recapture} className="h-10 rounded-md border border-white/25 px-4 text-sm font-semibold text-white hover:bg-white/10">
+                Retake
+              </button>
+              <p className="text-xs text-slate-400">Captured — continue below.</p>
+            </>
+          )}
+        </div>
       </div>
 
-      <ul className="mt-3 grid gap-1 text-[13px] leading-snug text-muted sm:grid-cols-2">
-        <li>Fill the frame with the label.</li>
-        <li>Hold steady in good light.</li>
-        <li>Avoid glare and shadows.</li>
-        <li>Guidance helps — it never guarantees analysis.</li>
-      </ul>
-
-      <div className="mt-3 space-y-3">
+      <div className="mt-3 space-y-2">
         <ErrorBanner title="Camera unavailable" message={error} />
-        {!photo && (
-          <div className="flex flex-wrap gap-2">
-            {!stream && <PrimaryButton onClick={startCamera}><Icon name="capture" /> Start camera</PrimaryButton>}
-            {stream && <PrimaryButton onClick={takePhoto}><Icon name="capture" /> Take photo</PrimaryButton>}
-            {stream && <SecondaryButton onClick={stopCamera}>Stop</SecondaryButton>}
-            <label className="inline-flex h-10 cursor-pointer items-center justify-center gap-1.5 rounded-lg border border-slate-300 bg-white px-4 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-50">
-              <Icon name="upload" />
-              Gallery fallback
-              <input type="file" accept="image/*" className="sr-only" aria-label="Choose from gallery" onChange={onGallery} />
-            </label>
-          </div>
-        )}
-        {photo && (
-          <div className="flex flex-wrap gap-2">
-            <SecondaryButton onClick={recapture}>Recapture</SecondaryButton>
-          </div>
-        )}
+        <p className="text-[13px] leading-snug text-muted">Fit the complete declaration panel inside the frame. Hold steady. Avoid glare.</p>
       </div>
-    </Card>
+    </div>
   );
 }

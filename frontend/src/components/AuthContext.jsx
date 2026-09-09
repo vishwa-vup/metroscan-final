@@ -125,9 +125,10 @@ export function RequireRole({ roles, children }) {
 
 export function Unauthorized() {
   return (
-    <div role="alert" className="mx-auto max-w-md rounded-card border border-amber-300 bg-amber-50 p-6 text-center shadow-card">
-      <p className="text-base font-semibold text-amber-900">Not authorized for this area</p>
-      <p className="mt-1 text-sm text-amber-800">
+    <div role="alert" className="mx-auto max-w-md border-t-2 border-ink px-1 py-8">
+      <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-faint">403</p>
+      <p className="mt-1 text-xl font-bold tracking-tight text-ink">Not authorized for this area</p>
+      <p className="mt-1 text-sm text-muted">
         Your account role doesn&apos;t include this page. Continue in your own portal instead.
       </p>
     </div>
